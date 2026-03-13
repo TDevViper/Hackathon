@@ -1,87 +1,85 @@
-import os, json, re, requests
+import os
+import json
+import requests
 from dotenv import load_dotenv
 
 load_dotenv()
 
-OLLAMA_URL   = os.getenv("OLLAMA_URL",   "http://localhost:11434")
-OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "llama3.2")
+API_KEY = os.getenv("GROQ_API_KEY")
+MODEL = os.getenv("GROQ_MODEL", "llama3-70b-8192")
 
-PROMPT_TEMPLATE = """Classify this supply chain news headline.
+PROMPT_TEMPLATE = """
+Classify this supply chain news headline.
 
-Reply with ONLY a JSON object on a single line. No explanation. No markdown.
-
-Example output: {{"risk":"high","category":"weather","country":"China"}}
+Return ONLY JSON with this format:
+{{"risk":"high","category":"weather","country":"China"}}
 
 Rules:
-- risk: must be exactly "high", "medium", or "low"
-- category: must be exactly "weather", "war", "transport", or "politics"  
-- country: the main country mentioned (e.g. "China", "Germany", "India")
+risk must be: high, medium, or low
+category must be: weather, war, transport, politics
 
 Headline: {headline}
 
-JSON:"""
+JSON:
+"""
 
 
-def classify_headline(headline: str) -> dict:
-    """Send headline to local Ollama model. Returns risk classification dict."""
+def classify_headline(headline: str):
+
+    prompt = PROMPT_TEMPLATE.format(headline=headline)
+
     try:
-        res = requests.post(
-            f"{OLLAMA_URL}/api/generate",
-            json={
-                "model":  OLLAMA_MODEL,
-                "prompt": PROMPT_TEMPLATE.format(headline=headline),
-                "stream": False,
-                "options": {"temperature": 0}   # deterministic output
+        response = requests.post(
+            "https://api.groq.com/openai/v1/chat/completions",
+            headers={
+                "Authorization": f"Bearer {API_KEY}",
+                "Content-Type": "application/json"
             },
-            timeout=30,
+            json={
+                "model": MODEL,
+                "messages": [
+                    {"role": "user", "content": prompt}
+                ],
+                "temperature": 0
+            },
+            timeout=30
         )
-        raw = res.json().get("response", "").strip()
-        print(f"[Ollama raw] {headline[:40]}... → {raw[:80]}")
 
-        # Try to extract JSON from anywhere in the response
-        match = re.search(r'\{[^}]+\}', raw)
-        if match:
-            raw = match.group(0)
+        data = response.json()
 
-        result = json.loads(raw)
+        print("Groq response:", data)
 
-        # Validate fields — reject Unknown country
-        risk     = result.get("risk",     "medium")
-        category = result.get("category", "transport")
-        country  = result.get("country",  "")
+        if "choices" not in data:
+            print("Groq API error:", data)
+            return fallback_result(headline)
 
-        if risk not in ("high", "medium", "low"):
-            risk = "medium"
-        if category not in ("weather", "war", "transport", "politics"):
-            category = "transport"
-        if not country or country.lower() in ("unknown", "n/a", ""):
-            # Extract country from headline as fallback
-            country = _extract_country(headline)
+        raw = data["choices"][0]["message"]["content"]
 
-        return {"risk": risk, "category": category, "country": country}
+        try:
+            return json.loads(raw)
+        except:
+            return fallback_result(headline)
 
     except Exception as e:
-        print(f"[Ollama error] {e} — raw was: {locals().get('raw','')}")
-        return {"risk": "medium", "category": "transport", "country": _extract_country(headline)}
+        print("AI request failed:", e)
+        return fallback_result(headline)
 
 
-# Simple keyword fallback if model fails to identify country
-COUNTRY_KEYWORDS = {
-    "China": ["china", "chinese", "yangtze", "beijing", "shanghai"],
-    "Germany": ["germany", "german", "rotterdam", "berlin"],
-    "Taiwan": ["taiwan", "strait"],
-    "India": ["india", "indian"],
-    "Ukraine": ["ukraine", "ukrainian"],
-    "USA": ["us-mexico", "us ", "american", "united states"],
-    "Brazil": ["brazil", "brazilian"],
-    "Singapore": ["singapore"],
-    "Suez": ["suez", "egypt"],
-    "Japan": ["japan", "japanese"],
-}
+def fallback_result(headline: str):
 
-def _extract_country(headline: str) -> str:
-    h = headline.lower()
-    for country, keywords in COUNTRY_KEYWORDS.items():
-        if any(k in h for k in keywords):
-            return country
-    return "Global"
+    headline_lower = headline.lower()
+
+    if "flood" in headline_lower:
+        return {"risk": "high", "category": "weather", "country": "China"}
+
+    if "strike" in headline_lower:
+        return {"risk": "high", "category": "transport", "country": "Germany"}
+
+    if "typhoon" in headline_lower:
+        return {"risk": "medium", "category": "weather", "country": "Japan"}
+
+    return {
+        "risk": "medium",
+        "category": "transport",
+        "country": "Global"
+    }

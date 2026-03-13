@@ -1,9 +1,8 @@
 from fastapi import APIRouter
-from app.services.risk_engine import build_risk_report
+from app.services.risk_engine import calculate_risk
 
 router = APIRouter()
 
 @router.get("/risk")
 def get_risk():
-    """Return aggregated risk per country with coordinates for map."""
-    return build_risk_report()
+    return calculate_risk()
