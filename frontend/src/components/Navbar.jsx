@@ -3,57 +3,42 @@ import { Link, useLocation } from 'react-router-dom'
 export default function Navbar() {
   const { pathname } = useLocation()
 
-  const link = (to, label) => ({
-    to, label,
-    style: {
-      padding: '6px 14px',
-      borderRadius: 6,
-      fontSize: 13,
-      fontWeight: 500,
-      color: pathname === to ? 'var(--text)' : 'var(--muted)',
-      background: pathname === to ? 'var(--bg3)' : 'transparent',
-      transition: 'all 0.15s'
-    }
-  })
-
-  const links = [link('/', 'Home'), link('/dashboard', 'Dashboard')]
-
   return (
     <nav style={{
       display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-      padding: '0 1.5rem', height: 56,
-      background: 'rgba(13,15,20,0.9)',
-      borderBottom: '1px solid var(--border)',
-      backdropFilter: 'blur(10px)',
-      position: 'sticky', top: 0, zIndex: 100
+      padding: '0 2rem', height: 60,
+      background: 'rgba(240,246,255,0.85)',
+      borderBottom: '1px solid var(--border2)',
+      backdropFilter: 'blur(16px)',
+      position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100,
     }}>
-      <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-        <span style={{ fontSize: 18 }}>⚠️</span>
-        <span style={{
-          fontFamily: "'IBM Plex Mono', monospace",
-          fontWeight: 600, fontSize: 15,
-          color: 'var(--text)', letterSpacing: 0.5
-        }}>SupplyGuard</span>
+      <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+        <div style={{
+          width: 32, height: 32, borderRadius: 8,
+          background: 'linear-gradient(135deg, #2563EB, #06B6D4)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          fontSize: 16, boxShadow: '0 4px 12px rgba(37,99,235,0.3)'
+        }}>⚡</div>
+        <span style={{ fontWeight: 800, fontSize: 16, color: 'var(--text)', letterSpacing: -0.5 }}>
+          Supply<span style={{ color: 'var(--blue)' }}>Guard</span>
+        </span>
       </Link>
 
       <div style={{ display: 'flex', gap: 4 }}>
-        {links.map(l => (
-          <Link key={l.to} to={l.to} style={l.style}>{l.label}</Link>
+        {[['/', 'Home'], ['/dashboard', 'Dashboard']].map(([to, label]) => (
+          <Link key={to} to={to} style={{
+            padding: '7px 18px', borderRadius: 8, fontSize: 14, fontWeight: 600,
+            color: pathname === to ? '#fff' : 'var(--muted2)',
+            background: pathname === to ? 'var(--blue)' : 'transparent',
+            boxShadow: pathname === to ? '0 4px 12px rgba(37,99,235,0.3)' : 'none',
+            transition: 'all 0.2s',
+          }}>{label}</Link>
         ))}
       </div>
 
-      <div style={{
-        display: 'flex', alignItems: 'center', gap: 6,
-        fontSize: 11, fontFamily: "'IBM Plex Mono', monospace",
-        color: 'var(--green)'
-      }}>
-        <span style={{
-          width: 7, height: 7, borderRadius: '50%',
-          background: 'var(--green)',
-          animation: 'pulse 2s ease infinite'
-        }} />
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, fontFamily: "'JetBrains Mono', monospace", color: 'var(--green)', fontWeight: 600 }}>
+        <span style={{ width: 7, height: 7, borderRadius: '50%', background: 'var(--green)', animation: 'pulse 2s infinite' }} />
         LIVE
-        <style>{`@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }`}</style>
       </div>
     </nav>
   )
