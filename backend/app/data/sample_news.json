@@ -1,0 +1,12 @@
+[
+  { "id": 1, "title": "Major flood disrupts Yangtze River ports in China", "source": "Reuters", "time": "2024-01-01" },
+  { "id": 2, "title": "Dock workers strike shuts Rotterdam port operations", "source": "BBC", "time": "2024-01-01" },
+  { "id": 3, "title": "Taiwan Strait tensions rise amid military drills", "source": "AP", "time": "2024-01-01" },
+  { "id": 4, "title": "Monsoon delays affecting India rail and road logistics", "source": "Times of India", "time": "2024-01-01" },
+  { "id": 5, "title": "Ukraine grain export corridor partially restored", "source": "Bloomberg", "time": "2024-01-01" },
+  { "id": 6, "title": "US-Mexico border crossing delays ease after negotiations", "source": "WSJ", "time": "2024-01-01" },
+  { "id": 7, "title": "Suez Canal traffic returns to normal after incident", "source": "Reuters", "time": "2024-01-01" },
+  { "id": 8, "title": "Germany factory output falls amid energy shortage", "source": "DW", "time": "2024-01-01" },
+  { "id": 9, "title": "Singapore port reports record container volumes", "source": "Straits Times", "time": "2024-01-01" },
+  { "id": 10, "title": "Brazil soybean exports hit by truckers protest", "source": "Reuters", "time": "2024-01-01" }
+]
