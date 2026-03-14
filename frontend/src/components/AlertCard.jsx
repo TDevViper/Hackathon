@@ -1,48 +1,70 @@
+import React from 'react';
+
 const RISK_CONFIG = {
-  high:   { color: '#EF4444', bg: '#FEF2F2', border: '#FECACA', label: 'HIGH',   dot: '#EF4444' },
-  medium: { color: '#D97706', bg: '#FFFBEB', border: '#FDE68A', label: 'MED',    dot: '#F59E0B' },
-  low:    { color: '#059669', bg: '#F0FDF4', border: '#A7F3D0', label: 'LOW',    dot: '#10B981' },
-}
-const CAT_ICON = { weather: '🌪', war: '⚔️', transport: '🚢', politics: '🏛' }
-const FLAG = { China:'🇨🇳', Germany:'🇩🇪', Netherlands:'🇳🇱', Taiwan:'🇹🇼', India:'🇮🇳', Ukraine:'🇺🇦', USA:'🇺🇸', US:'🇺🇸', Suez:'🇪🇬', Egypt:'🇪🇬', Singapore:'🇸🇬', Brazil:'🇧🇷', Japan:'🇯🇵', Global:'🌍' }
+  high:   { color: 'text-red-400', bg: 'bg-red-500/10', border: 'border-red-500/20', label: 'CRITICAL', dot: 'bg-red-500' },
+  medium: { color: 'text-amber-400', bg: 'bg-amber-500/10', border: 'border-amber-500/20', label: 'WARNING',  dot: 'bg-amber-500' },
+  low:    { color: 'text-emerald-400', bg: 'bg-emerald-500/10', border: 'border-emerald-500/20', label: 'STABLE',   dot: 'bg-emerald-500' },
+};
+
+const CAT_ICON = { weather: '🌪', war: '⚔️', transport: '🚢', politics: '🏛' };
+const FLAG = { 
+  China:'🇨🇳', Germany:'🇩🇪', Netherlands:'🇳🇱', Taiwan:'🇹🇼', India:'🇮🇳', 
+  Ukraine:'🇺🇦', USA:'🇺🇸', US:'🇺🇸', Suez:'🇪🇬', Egypt:'🇪🇬', 
+  Singapore:'🇸🇬', Brazil:'🇧🇷', Japan:'🇯🇵', Global:'🌍' 
+};
 
 export default function AlertCard({ item }) {
-  const cfg = RISK_CONFIG[item.risk] || RISK_CONFIG.medium
-  return (
-    <div style={{
-      display: 'flex', alignItems: 'center', gap: 14,
-      background: cfg.bg, border: `1px solid ${cfg.border}`,
-      borderRadius: 10, padding: '12px 16px',
-      transition: 'all 0.15s', animation: 'fadeUp 0.3s ease forwards',
-    }}
-    onMouseEnter={e => { e.currentTarget.style.transform='translateY(-1px)'; e.currentTarget.style.boxShadow='0 4px 16px rgba(0,0,0,0.08)' }}
-    onMouseLeave={e => { e.currentTarget.style.transform='none'; e.currentTarget.style.boxShadow='none' }}
-    >
-      <div style={{
-        minWidth: 38, height: 38, borderRadius: 10, fontSize: 18,
-        background: 'white', border: `1px solid ${cfg.border}`,
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        boxShadow: '0 2px 8px rgba(0,0,0,0.06)'
-      }}>{CAT_ICON[item.category] || '📡'}</div>
+  const cfg = RISK_CONFIG[item.risk] || RISK_CONFIG.medium;
 
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ fontWeight: 600, fontSize: 13, color: 'var(--text)', marginBottom: 4, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-          {item.title}
+  return (
+    <div className={`
+      flex items-center gap-4 p-4 rounded-xl border transition-all duration-300
+      ${cfg.bg} ${cfg.border} hover:scale-[1.01] hover:shadow-[0_0_20px_rgba(0,0,0,0.2)]
+      group cursor-pointer backdrop-blur-sm
+    `}>
+      {/* Category Icon with Layered Shadow */}
+      <div className={`
+        min-w-[42px] h-[42px] rounded-lg text-xl flex items-center justify-center
+        bg-slate-900 border ${cfg.border} shadow-inner transition-transform group-hover:rotate-12
+      `}>
+        {CAT_ICON[item.category] || '📡'}
+      </div>
+
+      {/* Main Content Area */}
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center gap-2 mb-1">
+          <h3 className="font-bold text-sm text-slate-100 truncate tracking-tight">
+            {item.title}
+          </h3>
+          {item.risk === 'high' && (
+            <span className="flex h-2 w-2 rounded-full bg-red-500 animate-pulse" />
+          )}
         </div>
-        <div style={{ display: 'flex', gap: 8, alignItems: 'center', fontSize: 12, color: 'var(--muted2)' }}>
-          <span>{FLAG[item.country] || '🌐'} {item.country}</span>
-          <span style={{ color: 'var(--border2)' }}>·</span>
-          <span style={{ textTransform: 'capitalize' }}>{item.category}</span>
-          <span style={{ color: 'var(--border2)' }}>·</span>
-          <span>{item.time}</span>
+        
+        <div className="flex items-center gap-2 text-xs font-medium text-slate-400">
+          <span className="flex items-center gap-1.5">
+            <span className="text-base leading-none">{FLAG[item.country] || '🌐'}</span>
+            {item.country}
+          </span>
+          <span className="text-slate-700">|</span>
+          <span className="capitalize">{item.category}</span>
+          <span className="text-slate-700">|</span>
+          <span className="font-mono text-[10px] opacity-70">{item.time}</span>
         </div>
       </div>
 
-      <span style={{
-        fontSize: 10, fontWeight: 700, fontFamily: "'JetBrains Mono', monospace",
-        color: cfg.color, background: 'white', border: `1px solid ${cfg.border}`,
-        padding: '3px 8px', borderRadius: 6, letterSpacing: 1, whiteSpace: 'nowrap',
-      }}>{cfg.label}</span>
+      {/* Modern Status Badge */}
+      <div className="flex flex-col items-end gap-1">
+        <span className={`
+          text-[9px] font-black font-mono px-2 py-0.5 rounded border
+          ${cfg.color} border-current bg-slate-950/50 tracking-tighter
+        `}>
+          {cfg.label}
+        </span>
+        <div className="w-12 h-1 bg-slate-800 rounded-full overflow-hidden">
+           <div className={`h-full ${item.risk === 'high' ? 'w-full bg-red-500' : item.risk === 'medium' ? 'w-1/2 bg-amber-500' : 'w-1/4 bg-emerald-500'}`} />
+        </div>
+      </div>
     </div>
-  )
+  );
 }

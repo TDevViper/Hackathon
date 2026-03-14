@@ -1,18 +1,24 @@
-import os, json, requests
+import os
+import json
+import requests
 from pathlib import Path
 from dotenv import load_dotenv
 
 load_dotenv()
 
-NEWS_API_KEY = os.getenv("NEWS_API_KEY")
+NEWS_API_KEY = os.getenv("NEWS_API_KEY", "")
 SAMPLE_PATH  = Path(__file__).parent.parent / "data" / "sample_news.json"
 
-SUPPLY_KEYWORDS = "supply chain OR port OR shipping OR logistics OR trade OR factory OR flood OR strike"
+SUPPLY_KEYWORDS = (
+    "supply chain OR port OR shipping OR logistics OR trade "
+    "OR factory OR flood OR strike OR earthquake OR tariff"
+)
+
 
 def fetch_headlines() -> list[dict]:
-    """Fetch headlines from NewsAPI. Falls back to sample_news.json if key missing."""
-    if not NEWS_API_KEY or NEWS_API_KEY == "your_newsapi_key_here":
-        print("No NewsAPI key — using sample data")
+    """Fetch headlines from NewsAPI; falls back to sample_news.json if no key."""
+    if not NEWS_API_KEY or NEWS_API_KEY.strip() == "":
+        print("[NewsService] No NewsAPI key — using sample_news.json")
         return _load_sample()
 
     try:
@@ -28,10 +34,14 @@ def fetch_headlines() -> list[dict]:
             timeout=10,
         )
         articles = res.json().get("articles", [])
+        if not articles:
+            print("[NewsService] No articles returned — using sample data")
+            return _load_sample()
+
         return [
             {
-                "id":    i + 1,
-                "title": a["title"],
+                "id":     i + 1,
+                "title":  a["title"],
                 "source": a["source"]["name"],
                 "time":   a["publishedAt"][:10],
             }
@@ -39,7 +49,7 @@ def fetch_headlines() -> list[dict]:
             if a.get("title")
         ]
     except Exception as e:
-        print(f"NewsAPI error: {e} — using sample data")
+        print(f"[NewsService] NewsAPI error: {e} — using sample data")
         return _load_sample()
 
 

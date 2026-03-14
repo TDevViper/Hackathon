@@ -1,40 +1,66 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 :root {
-  --bg:      #F0F6FF;
-  --bg2:     #FFFFFF;
-  --bg3:     #E8F1FC;
-  --border:  rgba(99,155,255,0.15);
-  --border2: rgba(99,155,255,0.3);
-  --text:    #0A1628;
-  --text2:   #1E3A5F;
-  --muted:   #7A9CC4;
-  --muted2:  #5B82A8;
-  --blue:    #2563EB;
-  --blue2:   #60A5FA;
-  --cyan:    #06B6D4;
-  --red:     #EF4444;
-  --amber:   #F59E0B;
-  --green:   #10B981;
-  --radius:  12px;
-  --shadow:  0 4px 24px rgba(37,99,235,0.08);
-  --shadow2: 0 8px 40px rgba(37,99,235,0.15);
+  --dashboard-bg: #020617; /* slate-950 */
+  --card-bg: rgba(15, 23, 42, 0.8); /* slate-900 with transparency */
+  --accent-primary: #3b82f6; /* blue-500 */
+  --danger-primary: #ef4444; /* red-500 */
+  --border-color: rgba(30, 41, 59, 0.5); /* slate-800 */
 }
 
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: 'Outfit', sans-serif;
-  font-size: 14px;
-  -webkit-font-smoothing: antialiased;
+@layer base {
+  body {
+    @apply bg-slate-950 text-slate-200 antialiased selection:bg-blue-500/30;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
 }
-a { color: inherit; text-decoration: none; }
-button { cursor: pointer; font-family: inherit; }
-::-webkit-scrollbar { width: 4px; }
-::-webkit-scrollbar-track { background: var(--bg3); }
-::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
-@keyframes fadeUp  { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:none; } }
-@keyframes pulse   { 0%,100%{opacity:1} 50%{opacity:0.4} }
-@keyframes shimmer { 0%{transform:translateX(-100%)} 100%{transform:translateX(200%)} }
-@keyframes float   { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+
+@layer components {
+  /* Glassmorphism Card Effect */
+  .glass-card {
+    @apply bg-slate-900/50 backdrop-blur-md border border-slate-800/50 shadow-xl;
+  }
+
+  /* Professional Button State */
+  .btn-primary {
+    @apply bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg 
+           font-semibold transition-all duration-200 active:scale-95
+           disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  /* Dashboard Input */
+  .input-field {
+    @apply bg-slate-900 border border-slate-800 rounded-lg py-2 px-4 
+           text-slate-200 focus:ring-2 focus:ring-blue-500/20 
+           focus:border-blue-500 outline-none transition-all;
+  }
+}
+
+/* Custom scrollbar for high-level feel */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--dashboard-bg);
+}
+::-webkit-scrollbar-thumb {
+  @apply bg-slate-800 rounded-full hover:bg-slate-700 transition-colors;
+}
+
+/* Pulse animation for High-Risk Alerts */
+@keyframes danger-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+.animate-danger {
+  animation: danger-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Print Configuration for Reports */
+@media print {
+  .no-print { display: none !important; }
+  body { background: white !important; color: black !important; }
+  .glass-card { border: 1px solid #e2e8f0; background: white; }
+}
