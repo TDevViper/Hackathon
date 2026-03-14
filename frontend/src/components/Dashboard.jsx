@@ -3,7 +3,7 @@ import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 
 import CountUp from 'react-countup'
 import EventList from './EventList'
 import RiskMap from './RiskMap'
-import { fetchNews, fetchRisk } from '../services/api'
+import { fetchNews, fetchRisk, fetchTrend } from '../services/api'
 
 const RISK_COLOR = { high: '#EF4444', medium: '#F59E0B', low: '#10B981' }
 const FLAG = { China:'🇨🇳', Germany:'🇩🇪', Netherlands:'🇳🇱', Taiwan:'🇹🇼', India:'🇮🇳', Ukraine:'🇺🇦', USA:'🇺🇸', US:'🇺🇸', Suez:'🇪🇬', Egypt:'🇪🇬', Singapore:'🇸🇬', Brazil:'🇧🇷', Japan:'🇯🇵', Global:'🌍' }

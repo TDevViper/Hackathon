@@ -45,3 +45,14 @@ export async function fetchRisk() {
     return MOCK_RISK
   }
 }
+
+export async function fetchTrend() {
+  try {
+    const res = await fetch(`${BASE}/trend`)
+    if (!res.ok) throw new Error()
+    return await res.json()
+  } catch {
+    console.warn('Trend data not available')
+    return []
+  }
+}

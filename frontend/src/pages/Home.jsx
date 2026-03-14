@@ -101,13 +101,6 @@ export default function Home() {
             onMouseEnter={e => e.currentTarget.style.transform='translateY(-2px)'}
             onMouseLeave={e => e.currentTarget.style.transform='none'}
             >Launch Dashboard →</button>
-
-            <button onClick={() => window.open('http://localhost:8000/docs')} style={{
-              padding: '14px 24px', background: 'white',
-              color: 'var(--blue)', border: '1.5px solid var(--border2)',
-              borderRadius: 10, fontSize: 15, fontWeight: 600,
-              boxShadow: 'var(--shadow)', transition: 'all 0.2s',
-            }}>API Docs</button>
           </div>
 
           {/* Stats row */}
