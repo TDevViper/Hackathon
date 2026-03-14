@@ -42,21 +42,22 @@ Be concise, direct, use bullet points. Max 3-4 sentences or 4 bullets.
     setMsgs(m => [...m, { role: 'user', text: q }])
     setLoading(true)
     try {
-      const res = await fetch('https://api.anthropic.com/v1/messages', {
+      const history = msgs.filter((_, i) => i > 0).map(m => ({ role: m.role, content: m.text }))
+      const res = await fetch('http://localhost:11434/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          model: 'claude-sonnet-4-20250514',
-          max_tokens: 300,
-          system: context,
+          model: 'phi3:mini',
+          stream: false,
           messages: [
-            ...msgs.filter((m, i) => i > 0).map(m => ({ role: m.role, content: m.text })),
+            { role: 'system', content: context },
+            ...history,
             { role: 'user', content: q }
           ]
         })
       })
       const data = await res.json()
-      const reply = data.content?.[0]?.text || 'Sorry, could not get a response.'
+      const reply = data.message?.content || 'Sorry, could not get a response.'
       setMsgs(m => [...m, { role: 'assistant', text: reply }])
     } catch {
       setMsgs(m => [...m, { role: 'assistant', text: 'Connection error. Make sure the API is reachable.' }])
