@@ -2,6 +2,7 @@ import json
 from collections import defaultdict
 from pathlib import Path
 from app.services.nlp_service import classify_headline
+from app.services.news_service import fetch_headlines
 
 SAMPLE_PATH = Path(__file__).parent.parent / "data" / "sample_news.json"
 
@@ -33,7 +34,7 @@ def calculate_risk(limit: int = 50) -> list[dict]:
     Classify a sample of news items and return the highest-risk event per country.
     limit: how many headlines to process (keep low for speed with local Ollama).
     """
-    news = _load_news()[:limit]
+    news = fetch_headlines()[:limit]
 
     country_events: dict[str, list[dict]] = defaultdict(list)
 

@@ -2,12 +2,12 @@ import os
 import json
 import requests
 from dotenv import load_dotenv
-import mysql.connector
+
 
 load_dotenv()
 
-OLLAMA_URL = "http://localhost:11434/api/generate"
-MODEL = "phi3:mini"
+OLLAMA_BASE_URL = "http://localhost:11434/api/generate"
+OLLAMA_OLLAMA_MODEL = "phi3:mini"
 PROMPT_TEMPLATE = """\
 Classify this supply chain news headline and return ONLY valid JSON — no explanation, no markdown, no extra text.
 

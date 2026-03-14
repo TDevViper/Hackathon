@@ -1,66 +1,31 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@700;800;900&family=Inter:wght@400;500;600;700&display=swap');
 
 :root {
-  --dashboard-bg: #020617; /* slate-950 */
-  --card-bg: rgba(15, 23, 42, 0.8); /* slate-900 with transparency */
-  --accent-primary: #3b82f6; /* blue-500 */
-  --danger-primary: #ef4444; /* red-500 */
-  --border-color: rgba(30, 41, 59, 0.5); /* slate-800 */
+  --bg: #030711;
+  --bg2: #070d1a;
+  --surface: #0d1526;
+  --surface2: #111d35;
+  --border: rgba(99,130,200,0.12);
+  --border2: rgba(99,130,200,0.22);
+  --text: #e8edf8;
+  --text2: #94a3b8;
+  --muted: #4a5878;
+  --muted2: #64748b;
+  --blue: #3b7ef8;
+  --cyan: #06b6d4;
+  --green: #10b981;
+  --red: #ef4444;
+  --amber: #f59e0b;
+  --shadow: 0 4px 24px rgba(0,0,0,0.4);
+  --shadow2: 0 2px 12px rgba(0,0,0,0.3);
 }
-
-@layer base {
-  body {
-    @apply bg-slate-950 text-slate-200 antialiased selection:bg-blue-500/30;
-    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
-  }
-}
-
-@layer components {
-  /* Glassmorphism Card Effect */
-  .glass-card {
-    @apply bg-slate-900/50 backdrop-blur-md border border-slate-800/50 shadow-xl;
-  }
-
-  /* Professional Button State */
-  .btn-primary {
-    @apply bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg 
-           font-semibold transition-all duration-200 active:scale-95
-           disabled:opacity-50 disabled:cursor-not-allowed;
-  }
-
-  /* Dashboard Input */
-  .input-field {
-    @apply bg-slate-900 border border-slate-800 rounded-lg py-2 px-4 
-           text-slate-200 focus:ring-2 focus:ring-blue-500/20 
-           focus:border-blue-500 outline-none transition-all;
-  }
-}
-
-/* Custom scrollbar for high-level feel */
-::-webkit-scrollbar {
-  width: 6px;
-}
-::-webkit-scrollbar-track {
-  background: var(--dashboard-bg);
-}
-::-webkit-scrollbar-thumb {
-  @apply bg-slate-800 rounded-full hover:bg-slate-700 transition-colors;
-}
-
-/* Pulse animation for High-Risk Alerts */
-@keyframes danger-pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.7; }
-}
-.animate-danger {
-  animation: danger-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
-
-/* Print Configuration for Reports */
-@media print {
-  .no-print { display: none !important; }
-  body { background: white !important; color: black !important; }
-  .glass-card { border: 1px solid #e2e8f0; background: white; }
-}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; margin: 0; -webkit-font-smoothing: antialiased; }
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--surface2); border-radius: 2px; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+@keyframes ping { 0%{transform:scale(1);opacity:0.8} 100%{transform:scale(2.2);opacity:0} }
+@keyframes spin { to{transform:rotate(360deg)} }
+@media print { .no-print { display: none !important; } body { background: white !important; color: black !important; } }
