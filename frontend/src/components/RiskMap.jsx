@@ -11,46 +11,26 @@ const ROUTES = [
 ]
 
 export default function RiskMap({ risks }) {
-  const ref = useRef(null)
-  const gRef = useRef(null)
-  const [ready, setReady] = useState(false)
-
-  const points = risks.map(r => {
-    const c = (r.lat && r.lng) ? {lat:r.lat,lng:r.lng} : COUNTRY_COORDS[r.country]||{lat:0,lng:0}
-    return {...c, color:RISK_COLOR[r.risk]||'#64748b', label:`${r.country} — ${(r.risk||'').toUpperCase()}`, size:r.risk==='high'?0.6:0.45}
-  })
-
-  useEffect(() => {
-    if (!ref.current) return
-    import('react-globe.gl').then(mod => {
-      const G = mod.default
-      const g = G()(ref.current)
-      g.width(ref.current.offsetWidth).height(340)
-       .backgroundColor('rgba(0,0,0,0)')
-       .globeImageUrl('//unpkg.com/three-globe/example/img/earth-night.jpg')
-       .atmosphereColor('#3b7ef8').atmosphereAltitude(0.15)
-       .pointsData(points).pointColor('color').pointAltitude(0.02).pointRadius('size').pointLabel('label')
-       .arcsData(ROUTES)
-       .arcStartLat(d=>d.from.lat).arcStartLng(d=>d.from.lng)
-       .arcEndLat(d=>d.to.lat).arcEndLng(d=>d.to.lng)
-       .arcColor(d=>RISK_COLOR[d.risk]).arcAltitude(0.25)
-       .arcDashLength(0.4).arcDashGap(0.2).arcDashAnimateTime(3000).arcStroke(0.6)
-       .controls().autoRotate = true
-      g.controls().autoRotateSpeed = 0.4
-      g.controls().enableZoom = false
-      g.pointOfView({lat:20,lng:30,altitude:2},1000)
-      gRef.current = g
-      setReady(true)
-    })
-    return () => gRef.current?._destructor?.()
-  }, [])
-
-  useEffect(() => { if (gRef.current && ready) gRef.current.pointsData(points) }, [risks, ready])
-
   return (
-    <div style={{ background:'var(--bg)', position:'relative', borderRadius:'0 0 16px 16px' }}>
-      <div ref={ref} style={{ width:'100%', height:340 }} />
-      {!ready && <div style={{ position:'absolute', inset:0, display:'flex', alignItems:'center', justifyContent:'center', fontFamily:'Space Mono,monospace', fontSize:11, color:'var(--muted)', letterSpacing:2 }}>LOADING GLOBE...</div>}
+    <div style={{ position:'relative', borderRadius:'0 0 16px 16px', overflow:'hidden', height:340 }}>
+      <video
+        src='/globe-bg.mp4'
+        autoPlay
+        loop
+        muted
+        playsInline
+        style={{ width:'100%', height:'100%', objectFit:'cover', display:'block' }}
+      />
+      <div style={{
+        position:'absolute', inset:0,
+        background:'rgba(0,0,0,0.35)',
+        display:'flex', alignItems:'center', justifyContent:'center',
+        flexDirection:'column', gap:8
+      }}>
+        <div style={{ fontSize:13, color:'white', fontFamily:"Space Mono,monospace", letterSpacing:2, opacity:0.85 }}>
+
+        </div>
+      </div>
     </div>
   )
 }
