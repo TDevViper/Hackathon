@@ -89,7 +89,7 @@ export default function Dashboard() {
               Updated {time} · {risks.length} events tracked
             </div>
           </div>
-          <button onClick={() => window.location.reload()} style={{
+          <button onClick={loadData} style={{
             padding:'8px 18px', background:'white', border:'1.5px solid var(--border2)',
             borderRadius:8, fontSize:13, fontWeight:600, color:'var(--blue)',
             boxShadow:'var(--shadow)', transition:'all 0.2s',
