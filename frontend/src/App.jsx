@@ -7,6 +7,9 @@ import AlertCard from './components/AlertCard';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import CountUp from 'react-countup';
 import { fetchNews, fetchRisk } from './services/api';
+import AIChat from './components/AIChat';
+import Skeleton from './components/Skeleton';
+import ToastContainer, { toast } from './components/Toast';
 
 const RISK_COLOR = { high:'#ef4444', medium:'#f59e0b', low:'#10b981' };
 const FLAG = { China:'🇨🇳',Germany:'🇩🇪',Netherlands:'🇳🇱',Taiwan:'🇹🇼',India:'🇮🇳',Ukraine:'🇺🇦',USA:'��🇸',US:'🇺🇸',Suez:'🇪🇬',Egypt:'🇪🇬',Singapore:'🇸🇬',Brazil:'🇧🇷',Japan:'🇯🇵',Global:'🌍' };
@@ -46,33 +49,42 @@ const App = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [showAlert, setShowAlert] = useState(false);
   const [highAlerts, setHighAlerts] = useState([]);
+  const [flash, setFlash] = useState(false);
+  const [lastUpdated, setLastUpdated] = useState(null);
 
   const loadData = useCallback(async () => {
     try {
       const [news, riskData] = await Promise.all([fetchNews(), fetchRisk()]);
       setHeadlines(news); setRisks(riskData);
+      setLastUpdated(new Date());
+      setFlash(true); setTimeout(() => setFlash(false), 800);
+      toast('Intelligence updated ✓', 'success');
       const highs = riskData.filter(r=>r.risk==='high');
       if (highs.length>0) { setHighAlerts(highs.map(h=>({location:h.country,value:'HIGH'}))); setShowAlert(true); }
-    } catch(e) { console.error(e); } finally { setLoading(false); }
+    } catch(e) { console.error(e); toast('Failed to fetch data', 'error'); } finally { setLoading(false); }
   }, []);
 
   useEffect(() => { loadData(); }, [loadData]);
   useEffect(() => { const t = setInterval(loadData,30000); return ()=>clearInterval(t); }, [loadData]);
+
+  useEffect(() => {
+    const handler = (e) => {
+      if (e.target.tagName === 'INPUT') return
+      if (e.key === 'r' || e.key === 'R') { loadData(); toast('Refreshing...', 'info') }
+    }
+    window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
+  }, [loadData])
 
   const filteredHeadlines = useMemo(() => headlines.filter(h => h.title.toLowerCase().includes(searchTerm.toLowerCase())||(h.country||'').toLowerCase().includes(searchTerm.toLowerCase())), [searchTerm, headlines]);
   const trendData = useMemo(() => buildTrend(headlines), [headlines]);
   const chartData = risks.map(r => ({ name:(FLAG[r.country]||'🌐')+' '+r.country, risk:r.risk==='high'?3:r.risk==='medium'?2:1, rawRisk:r.risk }));
   const stats = { high:risks.filter(r=>r.risk==='high').length, medium:risks.filter(r=>r.risk==='medium').length, low:risks.filter(r=>r.risk==='low').length };
 
-  if (loading) return (
-    <div style={{ minHeight:'100vh', background:'var(--bg)', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', gap:16 }}>
-      <div style={{ width:44, height:44, borderRadius:'50%', border:'2px solid var(--surface2)', borderTopColor:'var(--blue)', animation:'spin 0.8s linear infinite' }} />
-      <div style={{ fontSize:11, fontFamily:'Space Mono,monospace', color:'var(--muted)', letterSpacing:2 }}>FETCHING INTELLIGENCE...</div>
-    </div>
-  );
+  if (loading) return <Skeleton />;
 
   return (
-    <div style={{ minHeight:'100vh', background:'var(--bg)', color:'var(--text)' }}>
+    <div style={{ minHeight:'100vh', background:'var(--bg)', color:'var(--text)', outline: flash ? '1.5px solid rgba(59,126,248,0.4)' : '1.5px solid transparent', transition:'outline 0.4s ease' }}>
       {showAlert && highAlerts.length>0 && <RiskAlertBanner alerts={highAlerts} onClose={()=>setShowAlert(false)} />}
       <DashboardHeader onSearch={setSearchTerm} onRefresh={loadData} />
       <main style={{ maxWidth:1400, margin:'0 auto', padding:'110px 1.5rem 2rem', display:'grid', gridTemplateColumns:'360px 1fr', gap:20 }}>
@@ -124,6 +136,8 @@ const App = () => {
           </div>
         </div>
       </main>
+      <AIChat news={headlines} risks={risks} />
+      <ToastContainer />
       <footer style={{ padding:'2rem', textAlign:'center' }}>
         <p style={{ fontSize:10, fontFamily:'Space Mono,monospace', color:'var(--muted)', letterSpacing:2 }}>SUPPLYGUARD · AI-POWERED RISK ARCHITECTURE · 2026</p>
       </footer>

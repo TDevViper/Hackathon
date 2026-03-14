@@ -1,7 +1,12 @@
 import { Link, useLocation } from 'react-router-dom'
+import { useState, useEffect } from 'react'
 
 export default function Navbar() {
   const { pathname } = useLocation()
+  const [dark, setDark] = useState(true)
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light')
+  }, [dark])
   return (
     <nav style={{
       display:'flex', alignItems:'center', justifyContent:'space-between',
@@ -26,9 +31,16 @@ export default function Navbar() {
           }}>{label}</Link>
         ))}
       </div>
-      <div style={{ display:'flex', alignItems:'center', gap:6, fontSize:11, fontFamily:'Space Mono,monospace', color:'var(--green)', fontWeight:700, letterSpacing:1 }}>
+      <div style={{ display:'flex', alignItems:'center', gap:12 }}>
+        <button onClick={() => setDark(d => !d)} style={{
+          background:'var(--surface)', border:'1px solid var(--border2)', borderRadius:20,
+          padding:'5px 12px', cursor:'pointer', fontSize:13, color:'var(--text2)',
+          display:'flex', alignItems:'center', gap:6, transition:'all 0.2s'
+        }}>{dark ? '☀️ Light' : '🌙 Dark'}</button>
+        <div style={{ display:'flex', alignItems:'center', gap:6, fontSize:11, fontFamily:'Space Mono,monospace', color:'var(--green)', fontWeight:700, letterSpacing:1 }}>
         <span style={{ width:6, height:6, borderRadius:'50%', background:'var(--green)', boxShadow:'0 0 8px var(--green)', animation:'pulse 2s infinite' }} />
         LIVE
+        </div>
       </div>
     </nav>
   )

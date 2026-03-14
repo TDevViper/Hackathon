@@ -29,3 +29,21 @@ body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-ser
 @keyframes ping { 0%{transform:scale(1);opacity:0.8} 100%{transform:scale(2.2);opacity:0} }
 @keyframes spin { to{transform:rotate(360deg)} }
 @media print { .no-print { display: none !important; } body { background: white !important; color: black !important; } }
+
+[data-theme="light"] {
+  --bg: #f0f4ff;
+  --bg2: #e8eef8;
+  --surface: #ffffff;
+  --surface2: #f1f5ff;
+  --border: rgba(59,126,248,0.12);
+  --border2: rgba(59,126,248,0.25);
+  --text: #0f172a;
+  --text2: #334155;
+  --muted: #94a3b8;
+  --muted2: #64748b;
+  --blue: #2563eb;
+  --cyan: #0891b2;
+  --green: #059669;
+  --red: #dc2626;
+  --amber: #d97706;
+}

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 const STATS = [
@@ -19,50 +19,11 @@ const RL = { high:'CRITICAL', medium:'WARNING', low:'STABLE' }
 
 export default function Home() {
   const navigate = useNavigate()
-  const globeRef = useRef(null)
-  const [ready, setReady] = useState(false)
   const [visible, setVisible] = useState(false)
 
   useEffect(() => { setTimeout(() => setVisible(true), 100) }, [])
 
-  useEffect(() => {
-    if (!globeRef.current) return
-    import('react-globe.gl').then(mod => {
-      const Globe = mod.default
-      const el = globeRef.current
-      const g = Globe()(el)
-      g.width(el.offsetWidth).height(el.offsetHeight)
-       .backgroundColor('rgba(0,0,0,0)')
-       .globeImageUrl('//unpkg.com/three-globe/example/img/earth-night.jpg')
-       .atmosphereColor('#3b7ef8').atmosphereAltitude(0.18)
-       .arcsData([
-         {from:{lat:35.86,lng:104.19},to:{lat:51.16,lng:10.45},color:'#ef4444'},
-         {from:{lat:23.69,lng:120.96},to:{lat:37.09,lng:-95.71},color:'#ef4444'},
-         {from:{lat:20.59,lng:78.96},to:{lat:51.16,lng:10.45},color:'#f59e0b'},
-         {from:{lat:1.35,lng:103.82},to:{lat:35.86,lng:104.19},color:'#10b981'},
-         {from:{lat:-14.23,lng:-51.92},to:{lat:37.09,lng:-95.71},color:'#f59e0b'},
-         {from:{lat:30.0,lng:32.5},to:{lat:51.16,lng:10.45},color:'#10b981'},
-         {from:{lat:35.86,lng:104.19},to:{lat:1.35,lng:103.82},color:'#ef4444'},
-       ])
-       .arcStartLat(d=>d.from.lat).arcStartLng(d=>d.from.lng)
-       .arcEndLat(d=>d.to.lat).arcEndLng(d=>d.to.lng)
-       .arcColor('color').arcAltitude(0.3)
-       .arcDashLength(0.4).arcDashGap(0.2).arcDashAnimateTime(2000).arcStroke(0.7)
-       .pointsData([
-         {lat:35.86,lng:104.19,color:'#ef4444',size:0.55},
-         {lat:23.69,lng:120.96,color:'#ef4444',size:0.55},
-         {lat:51.16,lng:10.45,color:'#f59e0b',size:0.45},
-         {lat:20.59,lng:78.96,color:'#f59e0b',size:0.45},
-         {lat:1.35,lng:103.82,color:'#10b981',size:0.38},
-       ])
-       .pointColor('color').pointAltitude(0.02).pointRadius('size')
-       .controls().autoRotate = true
-      g.controls().autoRotateSpeed = 0.4
-      g.controls().enableZoom = false
-      g.pointOfView({lat:20,lng:60,altitude:1.9},1200)
-      setReady(true)
-    })
-  }, [])
+
 
   return (
     <div style={{ paddingTop:56, minHeight:'100vh', background:'var(--bg)', overflow:'hidden', position:'relative' }}>
@@ -104,31 +65,89 @@ export default function Home() {
           </div>
         </div>
 
-        <div style={{ position:'relative', height:'100vh', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center' }}>
-          <div style={{ position:'relative', width:'100%', flex:1 }}>
-            <div ref={globeRef} style={{ width:'100%', height:'100%' }} />
-            {!ready && <div style={{ position:'absolute', inset:0, display:'flex', alignItems:'center', justifyContent:'center', fontFamily:'Space Mono,monospace', fontSize:11, color:'var(--muted)', letterSpacing:2 }}>LOADING GLOBE...</div>}
-          </div>
-          {ready && (
-            <div style={{ width:'90%', marginBottom:'2rem', background:'var(--surface)', border:'1px solid var(--border)', borderRadius:12, overflow:'hidden' }}>
-              <div style={{ padding:'8px 14px', borderBottom:'1px solid var(--border)', display:'flex', alignItems:'center', gap:8, fontSize:10, fontFamily:'Space Mono,monospace', color:'var(--muted2)', letterSpacing:1 }}>
-                <span style={{ width:5, height:5, borderRadius:'50%', background:'var(--red)', boxShadow:'0 0 6px var(--red)', animation:'pulse 1.5s infinite' }} />
-                LIVE THREAT FEED
-              </div>
-              {EVENTS.map((e,i)=>(
-                <div key={i} style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'9px 14px', borderBottom:i<EVENTS.length-1?'1px solid var(--border)':'none', opacity:visible?1:0, transition:`opacity 0.4s ease ${0.5+i*0.1}s` }}>
-                  <div style={{ display:'flex', alignItems:'center', gap:10 }}>
-                    <span style={{ fontSize:14 }}>{e.flag}</span>
-                    <div>
-                      <div style={{ fontSize:12, fontWeight:600, color:'var(--text)', lineHeight:1.3 }}>{e.event}</div>
-                      <div style={{ fontSize:10, color:'var(--muted2)', fontFamily:'Space Mono,monospace' }}>{e.country} · {e.time}</div>
-                    </div>
-                  </div>
-                  <span style={{ fontSize:9, fontFamily:'Space Mono,monospace', fontWeight:700, padding:'3px 8px', borderRadius:4, letterSpacing:0.5, background:`${RC[e.risk]}18`, color:RC[e.risk], border:`1px solid ${RC[e.risk]}40` }}>{RL[e.risk]}</span>
-                </div>
-              ))}
+        <div style={{ position:'relative', height:'100vh', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', perspective:'1200px' }}>
+
+          {/* 3D Video Globe Card */}
+          <div style={{
+            position:'relative', width:'92%', flex:1,
+            transform:'rotateY(-8deg) rotateX(4deg) scale(1.02)',
+            transformStyle:'preserve-3d',
+            transition:'transform 0.6s ease',
+            borderRadius:20,
+            boxShadow:'0 40px 120px rgba(59,126,248,0.35), 0 0 0 1px rgba(59,126,248,0.15), inset 0 1px 0 rgba(255,255,255,0.08)',
+            overflow:'hidden',
+          }}
+            onMouseEnter={e=>{ e.currentTarget.style.transform='rotateY(-3deg) rotateX(2deg) scale(1.04)' }}
+            onMouseLeave={e=>{ e.currentTarget.style.transform='rotateY(-8deg) rotateX(4deg) scale(1.02)' }}
+          >
+            {/* Video */}
+            <video
+              src="/globe-bg.mp4"
+              autoPlay loop muted playsInline
+              style={{ width:'100%', height:'100%', objectFit:'cover', display:'block', borderRadius:20 }}
+            />
+
+            {/* Blue gradient overlay */}
+            <div style={{
+              position:'absolute', inset:0, borderRadius:20,
+              background:'linear-gradient(135deg, rgba(0,0,0,0.15) 0%, rgba(59,126,248,0.08) 50%, rgba(0,0,0,0.4) 100%)',
+              pointerEvents:'none'
+            }}/>
+
+            {/* Scanline shimmer */}
+            <div style={{
+              position:'absolute', inset:0, borderRadius:20,
+              backgroundImage:'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(59,126,248,0.02) 2px, rgba(59,126,248,0.02) 4px)',
+              pointerEvents:'none'
+            }}/>
+
+            {/* Top-left label */}
+            <div style={{
+              position:'absolute', top:16, left:16,
+              display:'flex', alignItems:'center', gap:8,
+              background:'rgba(0,0,0,0.55)', backdropFilter:'blur(8px)',
+              border:'1px solid rgba(59,126,248,0.3)', borderRadius:8,
+              padding:'6px 12px', fontSize:10,
+              fontFamily:'Space Mono,monospace', color:'#3b7ef8', letterSpacing:1.5
+            }}>
+              <span style={{ width:5, height:5, borderRadius:'50%', background:'#3b7ef8', boxShadow:'0 0 8px #3b7ef8', animation:'pulse 2s infinite' }}/>
+              LIVE · GLOBAL RISK MAP
             </div>
-          )}
+
+            {/* Corner glow accents */}
+            <div style={{ position:'absolute', top:0, right:0, width:120, height:120, background:'radial-gradient(circle at top right, rgba(59,126,248,0.25), transparent 70%)', pointerEvents:'none', borderRadius:20 }}/>
+            <div style={{ position:'absolute', bottom:0, left:0, width:120, height:120, background:'radial-gradient(circle at bottom left, rgba(6,182,212,0.2), transparent 70%)', pointerEvents:'none', borderRadius:20 }}/>
+
+            {/* 3D edge highlight (simulates depth) */}
+            <div style={{
+              position:'absolute', inset:0, borderRadius:20,
+              border:'1px solid rgba(255,255,255,0.07)',
+              pointerEvents:'none'
+            }}/>
+          </div>
+
+          {/* Live Threat Feed below video */}
+          <div style={{ width:'90%', marginBottom:'1.5rem', marginTop:'1rem', background:'rgba(15,20,35,0.8)', backdropFilter:'blur(12px)', border:'1px solid rgba(59,126,248,0.15)', borderRadius:12, overflow:'hidden',
+            transform:'rotateY(-8deg) rotateX(2deg)', transformStyle:'preserve-3d',
+            boxShadow:'0 20px 60px rgba(0,0,0,0.4), 0 0 0 1px rgba(59,126,248,0.1)'
+          }}>
+            <div style={{ padding:'8px 14px', borderBottom:'1px solid rgba(59,126,248,0.1)', display:'flex', alignItems:'center', gap:8, fontSize:10, fontFamily:'Space Mono,monospace', color:'var(--muted2)', letterSpacing:1 }}>
+              <span style={{ width:5, height:5, borderRadius:'50%', background:'var(--red)', boxShadow:'0 0 6px var(--red)', animation:'pulse 1.5s infinite' }} />
+              LIVE THREAT FEED
+            </div>
+            {EVENTS.map((e,i)=>(
+              <div key={i} style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'9px 14px', borderBottom:i<EVENTS.length-1?'1px solid rgba(59,126,248,0.08)':'none', opacity:visible?1:0, transition:`opacity 0.4s ease ${0.3+i*0.1}s` }}>
+                <div style={{ display:'flex', alignItems:'center', gap:10 }}>
+                  <span style={{ fontSize:14 }}>{e.flag}</span>
+                  <div>
+                    <div style={{ fontSize:12, fontWeight:600, color:'var(--text)', lineHeight:1.3 }}>{e.event}</div>
+                    <div style={{ fontSize:10, color:'var(--muted2)', fontFamily:'Space Mono,monospace' }}>{e.country} · {e.time}</div>
+                  </div>
+                </div>
+                <span style={{ fontSize:9, fontFamily:'Space Mono,monospace', fontWeight:700, padding:'3px 8px', borderRadius:4, letterSpacing:0.5, background:`${RC[e.risk]}18`, color:RC[e.risk], border:`1px solid ${RC[e.risk]}40` }}>{RL[e.risk]}</span>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </div>
