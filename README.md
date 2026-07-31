@@ -1,7 +1,7 @@
 # SupplyGuard — AI-Powered Supply Chain Risk Intelligence
 
 ## What is this?
-SupplyGuard is a real-time supply chain risk monitoring dashboard. It scans global news headlines, classifies them by risk level using a local AI model, and displays threats on an interactive map with live updates.
+SupplyGuard is a real-time supply chain risk monitoring dashboard that monitors global news, classifies potential supply chain risks using a local AI model, and visualizes threats through interactive dashboards, charts, and a 3D globe. The application also includes responsive UI enhancements, theme support, and real-time data refresh for a better user experience.
 
 ---
 
